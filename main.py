@@ -4,6 +4,7 @@ import os
 import psycopg2
 from fastapi import FastAPI
 from pydantic import BaseModel
+import uvicorn  # Ensure Uvicorn is imported
 
 # Logging setup
 logging.basicConfig(level=logging.DEBUG)
@@ -67,6 +68,5 @@ modules.gpt_strategy.register_routes(app)
 
 # ✅ Ensure Uvicorn starts with Cloud Run-compatible settings
 if __name__ == "__main__":
-    import uvicorn
-    port = int(os.getenv("PORT", 8080))  # Ensure correct port assignment
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    port = int(os.getenv("PORT", "8080"))  # Ensure PORT is correctly set
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)

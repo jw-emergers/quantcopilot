@@ -7,6 +7,10 @@ WORKDIR /app
 # Copy files
 COPY . /app
 
+# Create a virtual environment and activate it
+RUN python -m venv /env
+ENV PATH="/env/bin:$PATH"
+
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 

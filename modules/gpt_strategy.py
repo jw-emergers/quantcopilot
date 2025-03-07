@@ -14,6 +14,9 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").replace("\n", "").strip()  # En
 if not OPENAI_API_KEY:
     raise ValueError("Missing OpenAI API Key. Set it as an environment variable.")
 
+# Initialize OpenAI Client
+client = openai.OpenAI(api_key=OPENAI_API_KEY)
+
 # Setup logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -26,9 +29,9 @@ class StrategyRequest(BaseModel):
 def generate_strategy_logic(description: str):
     prompt = f"""
     Convert the following trading strategy description into a structured JSON format:
-    
+
     "{description}"
-    
+
     The output should strictly follow this format:
     {{
       "strategy": [
@@ -50,18 +53,17 @@ def generate_strategy_logic(description: str):
     """
 
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4",  # Change to "gpt-3.5-turbo" if needed
             messages=[
                 {"role": "system", "content": "You are a financial trading assistant."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=500,
-            api_key=OPENAI_API_KEY  # Explicitly pass the cleaned API key
+            max_tokens=500
         )
 
         # Extract GPT-generated response
-        strategy_logic_raw = response["choices"][0]["message"]["content"].strip()
+        strategy_logic_raw = response.choices[0].message.content.strip()
 
         # Log raw response
         logger.debug(f"Raw GPT Response: {strategy_logic_raw}")

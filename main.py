@@ -7,7 +7,7 @@ from pydantic import BaseModel
 import uvicorn  # Ensure Uvicorn is imported
 
 # Logging setup
-# just to do a change to push
+
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 

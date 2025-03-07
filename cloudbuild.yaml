@@ -25,12 +25,11 @@ steps:
       - '--platform'
       - 'managed'
       - '--region'
-      - 'europe-west2'
+      - 'europe-west2'  # Change to the desired region
       - '--allow-unauthenticated'
-
-options:
-  logging: CLOUD_LOGGING_ONLY  # or use 'logs_bucket'
-  logs_bucket: 'gs://quantcopilot-cloudbuild-logs-europe-west2'  # Specify your new bucket here
 
 images:
   - 'gcr.io/$PROJECT_ID/fastapi-app'
+
+options:
+  logging: CLOUD_LOGGING_ONLY  # Enable logging to Google Cloud Logging

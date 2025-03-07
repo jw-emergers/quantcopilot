@@ -64,3 +64,9 @@ import modules.gpt_strategy
 modules.backtest.register_routes(app)
 modules.stock_query.register_routes(app)
 modules.gpt_strategy.register_routes(app)
+
+# ✅ Ensure Uvicorn starts with Cloud Run-compatible settings
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.getenv("PORT", 8080))  # Ensure correct port assignment
+    uvicorn.run(app, host="0.0.0.0", port=port)

@@ -25,8 +25,12 @@ steps:
       - '--platform'
       - 'managed'
       - '--region'
-      - 'europe-west2'  # Update with the region you prefer
+      - 'europe-west2'
       - '--allow-unauthenticated'
+
+options:
+  logging: CLOUD_LOGGING_ONLY  # or use 'logs_bucket'
+  logs_bucket: 'gs://quantcopilot-cloudbuild-logs-europe-west2'  # Specify your new bucket here
 
 images:
   - 'gcr.io/$PROJECT_ID/fastapi-app'

@@ -9,7 +9,7 @@ import logging
 router = APIRouter()
 
 # OpenAI API Key (set as an environment variable for security)
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").replace("\n", "").strip()  # Ensures no extra spaces or newlines
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 
 if not OPENAI_API_KEY:
     raise ValueError("Missing OpenAI API Key. Set it as an environment variable.")

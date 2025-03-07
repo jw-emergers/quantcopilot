@@ -25,7 +25,7 @@ steps:
       - '--platform'
       - 'managed'
       - '--region'
-      - 'europe-west1'  # Update with the region you prefer
+      - 'europe-north1'  # Update with the region you prefer
       - '--allow-unauthenticated'
 
 images:

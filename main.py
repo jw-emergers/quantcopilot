@@ -71,5 +71,13 @@ if __name__ == "__main__":
     import uvicorn
     import os
 
-    port = os.environ.get("PORT", "8080")  # Use PORT from env, default to 8080
-    uvicorn.run("main:app", host="0.0.0.0", port=int(port))
+    port = os.environ.get("PORT")
+    
+    # If PORT is not set or invalid, default to 8080
+    try:
+        port = int(port) if port and port.isdigit() else 8080
+    except ValueError:
+        port = 8080
+
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
+

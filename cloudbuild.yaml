@@ -1,0 +1,32 @@
+steps:
+  # Step 1: Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/fastapi-app'
+      - '.'
+
+  # Step 2: Push Docker image to Google Container Registry (GCR)
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/fastapi-app'
+
+  # Step 3: Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    args:
+      - 'gcloud'
+      - 'run'
+      - 'deploy'
+      - 'fastapi-app'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/fastapi-app'
+      - '--platform'
+      - 'managed'
+      - '--region'
+      - 'us-central1'  # Update with the region you prefer
+      - '--allow-unauthenticated'
+
+images:
+  - 'gcr.io/$PROJECT_ID/fastapi-app'

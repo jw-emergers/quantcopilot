@@ -68,7 +68,8 @@ modules.gpt_strategy.register_routes(app)
 
 # ✅ Ensure Uvicorn starts with Cloud Run-compatible settings
 if __name__ == "__main__":
-    port = os.getenv("PORT")  # Get PORT from environment
-    if port is None or not port.isdigit():  # Ensure it's a valid integer
-        port = "8080"  # Default to 8080 if not set
-    uvicorn.run("main:app", host="0.0.0.0", port=int(port), reload=False)
+    import uvicorn
+    import os
+
+    port = os.environ.get("PORT", "8080")  # Use PORT from env, default to 8080
+    uvicorn.run("main:app", host="0.0.0.0", port=int(port))

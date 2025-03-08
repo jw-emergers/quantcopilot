@@ -28,7 +28,7 @@ class StrategyRequest(BaseModel):
 # Function to generate structured JSON strategy logic using GPT
 def generate_strategy_logic(description: str):
     prompt = f"""
-    Convert the following trading strategy description into a structured JSON format:
+    Convert the following trading strategy description into a structured JSON format.
 
     "{description}"
 
@@ -41,7 +41,7 @@ def generate_strategy_logic(description: str):
           "indicator": "<Technical Indicator>",
           "period": <Period>,
           "type": "entry" or "exit",
-          "condition": "self.data.close[0] > self.indicators[\"SMA\"][0]"
+          "condition": "self.data.close[0] > self.indicators['SMA'][0]"
         }},
         {{
           "ticker": "<TICKER>",
@@ -65,8 +65,7 @@ def generate_strategy_logic(description: str):
                 {"role": "system", "content": "You are a financial trading assistant. You generate structured trading strategies in JSON format."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=500,
-            response_format={"type": "json_object"}  # ✅ Fixed: Now using a dictionary, not a string
+            max_tokens=500
         )
 
         # Extract GPT-generated response
@@ -75,7 +74,7 @@ def generate_strategy_logic(description: str):
         # Log raw response
         logger.debug(f"Raw GPT Response: {strategy_logic_raw}")
 
-        # Ensure response is valid JSON
+        # Try to extract valid JSON
         try:
             strategy_logic = json.loads(strategy_logic_raw)  # ✅ Strict JSON validation
         except json.JSONDecodeError as e:

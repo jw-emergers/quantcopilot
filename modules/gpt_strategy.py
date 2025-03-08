@@ -66,7 +66,7 @@ def generate_strategy_logic(description: str):
                 {"role": "user", "content": prompt}
             ],
             max_tokens=500,
-            response_format="json"  # ✅ Corrected format
+            response_format={"type": "json_object"}  # ✅ Fixed: Now using a dictionary, not a string
         )
 
         # Extract GPT-generated response

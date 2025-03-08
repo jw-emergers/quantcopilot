@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-import openai
+import openai  # Ensure you have `openai` installed: pip install openai
 import os
 import json
 import logging
@@ -28,37 +28,42 @@ class StrategyRequest(BaseModel):
 # Function to generate structured JSON strategy logic using GPT
 def generate_strategy_logic(description: str):
     prompt = f"""
-    Convert the following trading strategy description into a structured JSON format.
+    Convert the following trading strategy description into a structured JSON format:
 
-    Ensure:
-    - The "condition" field correctly escapes double quotes inside strings.
-    - The JSON is valid and contains no additional text.
+    "{description}"
 
-    Example output:
+    The output must strictly follow this format:
+
     {{
       "strategy": [
         {{
-          "indicator": "SMA",
-          "period": 50,
-          "type": "entry",
-          "condition": "self.data.close[0] > self.indicators[\\"SMA\\"][0]"
+          "ticker": "<TICKER>",
+          "indicator": "<Technical Indicator>",
+          "period": <Period>,
+          "type": "entry" or "exit",
+          "condition": "self.data.close[0] > self.indicators['SMA'][0]"
         }},
         {{
-          "indicator": "SMA",
-          "period": 50,
+          "ticker": "<TICKER>",
+          "indicator": "<Technical Indicator>",
+          "period": <Period>,
           "type": "exit",
-          "condition": "self.data.close[0] < self.indicators[\\"SMA\\"][0]"
+          "condition": "self.data.close[0] < self.indicators['SMA'][0]"
         }}
       ]
     }}
 
-    Now, generate a strategy for:
-    "{description}"
+    Guidelines:
+    - Ensure correct JSON formatting (double quotes, no trailing commas).
+    - Use Python-evaluable conditions for Backtrader (e.g., "self.data.close[0] > self.indicators['SMA'][0]").
+    - The "ticker" field should always match the stock symbol in the request.
+    - Only include supported indicators (SMA, EMA, RSI, MACD, BollingerBands).
+    - The exit condition should NOT be based on a time delay (Backtrader handles that differently).
     """
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4",  # Change to "gpt-3.5-turbo" if needed
             messages=[
                 {"role": "system", "content": "You are a financial trading assistant."},
                 {"role": "user", "content": prompt}
@@ -82,7 +87,7 @@ def generate_strategy_logic(description: str):
         # Log parsed JSON response
         logger.debug(f"Parsed Strategy Logic: {strategy_logic}")
 
-        return strategy_logic
+        return strategy_logic  # Convert string to dictionary
 
     except Exception as e:
         logger.error(f"Error generating strategy: {str(e)}")

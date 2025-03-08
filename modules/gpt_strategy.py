@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-import openai  # Ensure you have `openai` installed: pip install openai
+import openai
 import os
 import json
 import logging
@@ -28,33 +28,37 @@ class StrategyRequest(BaseModel):
 # Function to generate structured JSON strategy logic using GPT
 def generate_strategy_logic(description: str):
     prompt = f"""
-    Convert the following trading strategy description into a structured JSON format:
+    Convert the following trading strategy description into a structured JSON format.
 
-    "{description}"
+    Ensure:
+    - The "condition" field correctly escapes double quotes inside strings.
+    - The JSON is valid and contains no additional text.
 
-    The output should strictly follow this format:
+    Example output:
     {{
       "strategy": [
         {{
           "indicator": "SMA",
           "period": 50,
           "type": "entry",
-          "condition": "self.data.close[0] > self.indicators['SMA'][0]"
+          "condition": "self.data.close[0] > self.indicators[\\"SMA\\"][0]"
         }},
         {{
           "indicator": "SMA",
           "period": 50,
           "type": "exit",
-          "condition": "self.data.close[0] < self.indicators['SMA'][0]"
+          "condition": "self.data.close[0] < self.indicators[\\"SMA\\"][0]"
         }}
       ]
     }}
-    Ensure the output is valid JSON with no extra text.
+
+    Now, generate a strategy for:
+    "{description}"
     """
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4",  # Change to "gpt-3.5-turbo" if needed
+            model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a financial trading assistant."},
                 {"role": "user", "content": prompt}
@@ -78,7 +82,7 @@ def generate_strategy_logic(description: str):
         # Log parsed JSON response
         logger.debug(f"Parsed Strategy Logic: {strategy_logic}")
 
-        return strategy_logic  # Convert string to dictionary
+        return strategy_logic
 
     except Exception as e:
         logger.error(f"Error generating strategy: {str(e)}")

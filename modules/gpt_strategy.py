@@ -28,11 +28,11 @@ class StrategyRequest(BaseModel):
 # Function to generate structured JSON strategy logic using GPT
 def generate_strategy_logic(description: str):
     prompt = f"""
-    Convert the following trading strategy description into a structured JSON format:
+    Convert the following trading strategy description into a structured JSON format.
 
     "{description}"
 
-    The output must strictly follow this format:
+    The output MUST be valid JSON, following this format:
 
     {{
       "rules": [
@@ -53,45 +53,17 @@ def generate_strategy_logic(description: str):
       ]
     }}
 
-    Guidelines:
-    - Ensure correct JSON formatting (double quotes, no trailing commas).
-    - Use Python-evaluable conditions for Backtrader (e.g., "self.data.close[0] > self.indicators['SMA'][0]").
-    - The "ticker" field should always match the stock symbol in the request.
-    - The exit condition should be based on bars since entry.
-    - If the exit is after N days, use `"daysSinceEntry"` as the indicator.
-
-    Example:
-
-    If the strategy is:
-    "Buy when price crosses above the 100-day SMA, sell after 20 days"
-    
-    The output should be:
-
-    {{
-      "rules": [
-        {{
-          "ticker": "MSFT",
-          "indicator": "SMA",
-          "period": 100,
-          "type": "entry",
-          "condition": "self.data.close[0] > self.indicators['SMA'][0]"
-        }},
-        {{
-          "ticker": "MSFT",
-          "indicator": "daysSinceEntry",
-          "period": 20,
-          "type": "exit",
-          "condition": "self.bar_executed + 20 <= len(self)"
-        }}
-      ]
-    }}
+    - Only return JSON. Do NOT include any explanation.
+    - Use double quotes ("") for all keys and string values.
+    - If the strategy includes an exit after N days, use `"daysSinceEntry"` as the indicator.
     """
 
     try:
         response = client.chat.completions.create(
             model="gpt-4",
+            response_format="json",  # ✅ Forces JSON output
             messages=[
-                {"role": "system", "content": "You are a financial trading assistant."},
+                {"role": "system", "content": "You are a financial trading assistant. You generate structured trading strategies in JSON format."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=500
@@ -105,10 +77,10 @@ def generate_strategy_logic(description: str):
 
         # Ensure response is valid JSON
         try:
-            strategy_logic = json.loads(strategy_logic_raw)
-        except json.JSONDecodeError:
+            strategy_logic = json.loads(strategy_logic_raw)  # ✅ Strict JSON validation
+        except json.JSONDecodeError as e:
             logger.error(f"Failed to parse OpenAI response: {strategy_logic_raw}")
-            raise HTTPException(status_code=500, detail="Failed to parse OpenAI response as JSON.")
+            raise HTTPException(status_code=500, detail=f"Failed to parse OpenAI response as JSON. Error: {str(e)}")
 
         # Log parsed JSON response
         logger.debug(f"Parsed Strategy Logic: {strategy_logic}")

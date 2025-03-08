@@ -15,7 +15,7 @@ if not OPENAI_API_KEY:
     raise ValueError("Missing OpenAI API Key. Set it as an environment variable.")
 
 # Initialize OpenAI Client
-client = openai.OpenAI()
+client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
 # Setup logging
 logging.basicConfig(level=logging.DEBUG)
@@ -66,8 +66,7 @@ def generate_strategy_logic(description: str):
                 {"role": "user", "content": prompt}
             ],
             max_tokens=500,
-            response_format="json",  # ✅ Corrected format
-            api_key=OPENAI_API_KEY  # ✅ Pass API Key properly
+            response_format="json"  # ✅ Corrected format
         )
 
         # Extract GPT-generated response

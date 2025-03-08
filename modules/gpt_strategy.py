@@ -15,7 +15,7 @@ if not OPENAI_API_KEY:
     raise ValueError("Missing OpenAI API Key. Set it as an environment variable.")
 
 # Initialize OpenAI Client
-client = openai.OpenAI(api_key=OPENAI_API_KEY)
+client = openai.OpenAI()
 
 # Setup logging
 logging.basicConfig(level=logging.DEBUG)
@@ -28,7 +28,7 @@ class StrategyRequest(BaseModel):
 # Function to generate structured JSON strategy logic using GPT
 def generate_strategy_logic(description: str):
     prompt = f"""
-    Convert the following trading strategy description into a structured JSON format.
+    Convert the following trading strategy description into a structured JSON format:
 
     "{description}"
 
@@ -41,7 +41,7 @@ def generate_strategy_logic(description: str):
           "indicator": "<Technical Indicator>",
           "period": <Period>,
           "type": "entry" or "exit",
-          "condition": "self.data.close[0] > self.indicators['SMA'][0]"
+          "condition": "self.data.close[0] > self.indicators[\"SMA\"][0]"
         }},
         {{
           "ticker": "<TICKER>",
@@ -66,7 +66,8 @@ def generate_strategy_logic(description: str):
                 {"role": "user", "content": prompt}
             ],
             max_tokens=500,
-            response_format={"type": "json_object"}  # ✅ Corrected format
+            response_format="json",  # ✅ Corrected format
+            api_key=OPENAI_API_KEY  # ✅ Pass API Key properly
         )
 
         # Extract GPT-generated response

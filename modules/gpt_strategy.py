@@ -35,7 +35,7 @@ def generate_strategy_logic(description: str):
     The output MUST be valid JSON, following this format:
 
     {{
-      "rules": [
+      "strategy": [
         {{
           "ticker": "<TICKER>",
           "indicator": "<Technical Indicator>",
@@ -61,12 +61,12 @@ def generate_strategy_logic(description: str):
     try:
         response = client.chat.completions.create(
             model="gpt-4",
-            response_format="json",  # ✅ Forces JSON output
             messages=[
                 {"role": "system", "content": "You are a financial trading assistant. You generate structured trading strategies in JSON format."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=500
+            max_tokens=500,
+            response_format={"type": "json"}  # ✅ Corrected format
         )
 
         # Extract GPT-generated response

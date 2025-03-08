@@ -35,7 +35,7 @@ def generate_strategy_logic(description: str):
     The output must strictly follow this format:
 
     {{
-      "strategy": [
+      "rules": [
         {{
           "ticker": "<TICKER>",
           "indicator": "<Technical Indicator>",
@@ -45,10 +45,10 @@ def generate_strategy_logic(description: str):
         }},
         {{
           "ticker": "<TICKER>",
-          "indicator": "<Technical Indicator>",
-          "period": <Period>,
+          "indicator": "daysSinceEntry",
+          "period": <Exit Period>,
           "type": "exit",
-          "condition": "self.data.close[0] < self.indicators['SMA'][0]"
+          "condition": "self.bar_executed + <Exit Period> <= len(self)"
         }}
       ]
     }}
@@ -57,13 +57,39 @@ def generate_strategy_logic(description: str):
     - Ensure correct JSON formatting (double quotes, no trailing commas).
     - Use Python-evaluable conditions for Backtrader (e.g., "self.data.close[0] > self.indicators['SMA'][0]").
     - The "ticker" field should always match the stock symbol in the request.
-    - Only include supported indicators (SMA, EMA, RSI, MACD, BollingerBands).
-    - The exit condition should NOT be based on a time delay (Backtrader handles that differently).
+    - The exit condition should be based on bars since entry.
+    - If the exit is after N days, use `"daysSinceEntry"` as the indicator.
+
+    Example:
+
+    If the strategy is:
+    "Buy when price crosses above the 100-day SMA, sell after 20 days"
+    
+    The output should be:
+
+    {{
+      "rules": [
+        {{
+          "ticker": "MSFT",
+          "indicator": "SMA",
+          "period": 100,
+          "type": "entry",
+          "condition": "self.data.close[0] > self.indicators['SMA'][0]"
+        }},
+        {{
+          "ticker": "MSFT",
+          "indicator": "daysSinceEntry",
+          "period": 20,
+          "type": "exit",
+          "condition": "self.bar_executed + 20 <= len(self)"
+        }}
+      ]
+    }}
     """
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4",  # Change to "gpt-3.5-turbo" if needed
+            model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a financial trading assistant."},
                 {"role": "user", "content": prompt}

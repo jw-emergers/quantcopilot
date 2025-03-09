@@ -24,6 +24,9 @@ logger = logging.getLogger(__name__)
 # Request model
 class StrategyRequest(BaseModel):
     description: str  # User-provided natural language description of the strategy
+    ticker: str = "MSFT"  # Default ticker (can be overridden)
+    start_date: str = "2023-01-01"  # Default start date (can be overridden)
+    end_date: str = "2024-01-01"  # Default end date (can be overridden)
 
 # Function to generate structured JSON strategy logic using GPT
 def generate_strategy_logic(description: str):
@@ -95,9 +98,19 @@ def generate_strategy_logic(description: str):
 def generate_strategy(request: StrategyRequest):
     """
     API endpoint to generate structured strategy logic from a natural language description.
+    Returns a full payload that can be directly used with /backtest.
     """
     strategy_logic = generate_strategy_logic(request.description)
-    return {"strategy_logic": strategy_logic}
+
+    # ✅ Include ticker, start_date, and end_date in the response
+    response_payload = {
+        "ticker": request.ticker,
+        "start_date": request.start_date,
+        "end_date": request.end_date,
+        "strategy_logic": strategy_logic
+    }
+
+    return response_payload
 
 # Register this module in FastAPI
 def register_routes(app):
